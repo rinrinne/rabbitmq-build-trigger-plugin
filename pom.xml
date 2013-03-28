@@ -1,0 +1,65 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.jenkins-ci.plugins</groupId>
+    <artifactId>plugin</artifactId>
+    <version>1.480.3</version><!-- which version of Jenkins is this plugin built against? -->
+  </parent>
+
+  <artifactId>rabbitmq-build-trigger</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>hpi</packaging>
+  <name>RabbitMQ build trigger plugin</name>
+  <description>A plugin that trigger build by message from RabbitMQ.</description>
+
+  <licenses>
+    <license>
+      <name>MIT</name>
+      <url>http://www.opensource.org/licenses/mit-license.php</url>
+      <comments>
+        Copyright 2013 rinrinne a.k.a. rin_ne. All rights reserved.
+      </comments>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>rinrinne</id>
+      <name>rinrinne</name>
+      <email>rinrin.ne@gmail.com</email>
+      <timezone>+9</timezone>
+    </developer>
+  </developers>
+  
+  <dependencies>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>rabbitmq-consumer</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.1</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.jenkins-ci.tools</groupId>
+        <artifactId>maven-hpi-plugin</artifactId>
+        <configuration>
+          <defaultPort>8091</defaultPort>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <scm>
+    <connection>scm:git:http://github.com/rinrinne/rabbitmq-build-trigger.git</connection>
+    <developerConnection>sccm:git:https://github.com/rinrinne/rabbitmq-build-trigger.git</developerConnection>
+    <url>https://github.com/rinrinne/rabbitmq-build-trigger/</url>
+  </scm>
+
+</project>
