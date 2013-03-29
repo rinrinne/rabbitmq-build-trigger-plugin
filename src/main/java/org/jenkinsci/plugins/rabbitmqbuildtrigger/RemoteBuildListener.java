@@ -102,8 +102,6 @@ public class RemoteBuildListener implements ExtensionPoint, ApplicationMessageLi
     public void onReceive(String queueName, JSONObject json) {
         LOGGER.info("#onReceive");
 
-        // {"project":"TEST","token":"debug","parameter":[{"name":"HOGE","value":"fugafuga"}],"":""}
-
         synchronized (lock) {
             for (RemoteBuildTrigger t : triggers) {
                 if (t.getProjectName().equals(json.getString(KEY_PROJECT))

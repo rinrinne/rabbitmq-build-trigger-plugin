@@ -12,6 +12,39 @@ rabbitmq-build-trigger is a Jenkins plugin to trigger build using remote build m
 Usage
 ------------------------
 
+You need to install [RabbitMQ Consumer Plugin][rabbitmq-consumer] and configure it before using this plugin.
+
+If you install this, *RabbitMQ Build Trigger* setting is added into your job project's build trigger section. please enable it then set your token. So build would be triggered if appropriate application message arrives.
+
+Application Message Format
+------------------------
+
+```json
+{
+    "project": "RPROJECTNAME", 
+    "token": "TOKEN",
+    "parameter": [
+        {
+            "name": "PARAMETERNAME", 
+            "value": "VALUE"
+        },
+        {
+            "name": "PARAMETERNAME2",
+            "value": "VALUE2"
+        }
+    ] 
+}
+```
+
+name in each parameters is compared with existing parameter name by case-insensitive.
+
+Material
+------------------------
+
+* [RabbitMQ Consumer Plugin][rabbitmq-consumer]
+
+[rabbitmq-consumer]: http://wiki.jenkins-ci.org/display/JENKINS/RabbitMQ+Consumer+Plugin
+
 License
 ------------------------
 
