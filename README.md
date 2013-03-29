@@ -7,7 +7,7 @@ rabbitmq-build-trigger: RabbitMQ Build Trigger Plugin for Jenkins
 Synopsis
 ------------------------
 
-rabbitmq-build-trigger is a Jenkins plugin to trigger build using remote build message in specific queue on RabbitMQ.
+rabbitmq-build-trigger is a Jenkins plugin to trigger build using application message for remote build in specific queue on RabbitMQ.
 
 Usage
 ------------------------
