@@ -57,9 +57,9 @@
   </build>
 
   <scm>
-    <connection>scm:git:http://github.com/rinrinne/rabbitmq-build-trigger.git</connection>
-    <developerConnection>sccm:git:https://github.com/rinrinne/rabbitmq-build-trigger.git</developerConnection>
-    <url>https://github.com/rinrinne/rabbitmq-build-trigger/</url>
+    <connection>scm:git:git://github.com/jenkinsci/rabbitmq-build-trigger.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/jenkinsci/rabbitmq-build-trigger.git</developerConnection>
+    <url>https://github.com/jenkinsci/rabbitmq-build-trigger</url>
   </scm>
 
 </project>
