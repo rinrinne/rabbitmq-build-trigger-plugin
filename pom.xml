@@ -9,8 +9,9 @@
   <artifactId>rabbitmq-build-trigger</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>hpi</packaging>
-  <name>RabbitMQ build trigger plugin</name>
+  <name>RabbitMQ Build Trigger Plugin</name>
   <description>A plugin that trigger build by message from RabbitMQ.</description>
+  <url>http://wiki.jenkins-ci.org/display/JENKINS/RabbitMQ+Build+Trigger+Plugin</url>
 
   <licenses>
     <license>
