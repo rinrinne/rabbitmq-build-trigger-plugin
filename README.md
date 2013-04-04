@@ -3,6 +3,7 @@ rabbitmq-build-trigger: RabbitMQ Build Trigger Plugin for Jenkins
 
 * Author: rinrinne a.k.a. rin_ne
 * Repository: http://github.com/jenkinsci/rabbitmq-build-trigger-plugin
+* Plugin Information: https://wiki.jenkins-ci.org/display/JENKINS/RabbitMQ+Build+Trigger+Plugin
 
 Synopsis
 ------------------------
