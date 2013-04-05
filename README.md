@@ -20,6 +20,11 @@ If you install this, *RabbitMQ Build Trigger* setting is added into your job pro
 Application Message Format
 ------------------------
 
+A message must have two properties.
+
+>  content_type: application/json
+>  app_id: remote-build
+
 ```json
 {
     "project": "RPROJECTNAME", 
