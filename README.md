@@ -22,8 +22,8 @@ Application Message Format
 
 A message must have two properties.
 
->  content_type: application/json
->  app_id: remote-build
+> content_type: application/json
+> app_id: remote-build
 
 ```json
 {
