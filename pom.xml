@@ -50,18 +50,20 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
-        <execution>
-          <id>add-eclipse-sources</id>
-          <phase>generate-sources</phase>
-          <goals>
-            <goal>add-source</goal>
-          </goals>
-          <configuration>
-            <sources>
-              <source>${basedir}/target/generated-sources/localizer</source>
-            </sources>
-          </configuration>
-        </execution>
+        <executions>
+          <execution>
+            <id>add-eclipse-sources</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>${basedir}/target/generated-sources/localizer</source>
+              </sources>
+            </configuration>
+          </execution>
+      </executions>
       </plugin>
       <plugin>
         <groupId>org.jenkins-ci.tools</groupId>
