@@ -79,6 +79,15 @@ public class RemoteBuildTrigger extends Trigger<AbstractProject<?, ?>> {
     }
 
     /**
+     * Sets token.
+     * 
+     * @param remoteBuildToken the token.
+     */
+    public void setRemoteBuildToken(String remoteBuildToken) {
+        this.remoteBuildToken = remoteBuildToken;
+    }
+
+    /**
      * Gets project name.
      * 
      * @return the project name.
