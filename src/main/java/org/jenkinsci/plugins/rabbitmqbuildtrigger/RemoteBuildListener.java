@@ -77,7 +77,7 @@ public class RemoteBuildListener implements ExtensionPoint, ApplicationMessageLi
      *            the queue name.
      */
     public void onBind(String queueName) {
-        LOGGER.info("#onBind: " + queueName);
+        LOGGER.info("Bind to: " + queueName);
     }
 
     /**
@@ -86,7 +86,7 @@ public class RemoteBuildListener implements ExtensionPoint, ApplicationMessageLi
      *            the queue name.
      */
     public void onUnbind(String queueName) {
-        LOGGER.info("#onUnbind: " + queueName);
+        LOGGER.info("Unbind from: " + queueName);
     }
 
     /**
@@ -100,8 +100,6 @@ public class RemoteBuildListener implements ExtensionPoint, ApplicationMessageLi
      *            the content of message.
      */
     public void onReceive(String queueName, JSONObject json) {
-        LOGGER.info("#onReceive");
-
         synchronized (lock) {
             for (RemoteBuildTrigger t : triggers) {
                 if (t.getProjectName().equals(json.getString(KEY_PROJECT))

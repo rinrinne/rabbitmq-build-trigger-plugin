@@ -105,7 +105,6 @@ public class RemoteBuildTrigger extends Trigger<AbstractProject<?, ?>> {
      *            the content of application message.
      */
     public void scheduleBuild(String queueName, JSONArray jsonArray) {
-        LOGGER.info("Enter");
         List<ParameterValue> parameters = getUpdatedParameters(jsonArray, getDefinitionParameters(job));
         job.scheduleBuild2(0, new RemoteBuildCause(queueName), new ParametersAction(parameters));
     }
