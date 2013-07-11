@@ -1,8 +1,7 @@
 package org.jenkinsci.plugins.rabbitmqbuildtrigger;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Logger;
 
 import hudson.Extension;
@@ -27,8 +26,7 @@ public class RemoteBuildListener implements ExtensionPoint, ApplicationMessageLi
 
     private static final Logger LOGGER = Logger.getLogger(RemoteBuildListener.class.getName());
 
-    private final List<RemoteBuildTrigger> triggers = new ArrayList<RemoteBuildTrigger>();
-    private final Object lock = new Object();
+    private final Set<RemoteBuildTrigger> triggers = new CopyOnWriteArraySet<RemoteBuildTrigger>();
 
     /**
      * @inheritDoc
@@ -53,11 +51,7 @@ public class RemoteBuildListener implements ExtensionPoint, ApplicationMessageLi
      *            the trigger.
      */
     public void addTrigger(RemoteBuildTrigger trigger) {
-        synchronized (lock) {
-            if (!triggers.contains(trigger)) {
-                triggers.add(trigger);
-            }
-        }
+        triggers.add(trigger);
     }
 
     /**
@@ -67,9 +61,7 @@ public class RemoteBuildListener implements ExtensionPoint, ApplicationMessageLi
      *            the trigger.
      */
     public void removeTrigger(RemoteBuildTrigger trigger) {
-        synchronized (lock) {
-            triggers.remove(trigger);
-        }
+        triggers.remove(trigger);
     }
 
     /**
@@ -101,18 +93,16 @@ public class RemoteBuildListener implements ExtensionPoint, ApplicationMessageLi
      *            the content of message.
      */
     public void onReceive(String queueName, JSONObject json) {
-        synchronized (lock) {
-            for (RemoteBuildTrigger t : triggers) {
+        for (RemoteBuildTrigger t : triggers) {
 
-                if (t.getRemoteBuildToken() == null) {
-                    LOGGER.log(Level.WARNING, "ignoring AMQP trigger for project {0}: no token set", t.getProjectName());
-                    continue;
-                }
+            if (t.getRemoteBuildToken() == null) {
+                LOGGER.log(Level.WARNING, "ignoring AMQP trigger for project {0}: no token set", t.getProjectName());
+                continue;
+            }
 
-                if (t.getProjectName().equals(json.getString(KEY_PROJECT))
-                        && t.getRemoteBuildToken().equals(json.getString(KEY_TOKEN))) {
-                    t.scheduleBuild(queueName, json.getJSONArray(KEY_PARAMETER));
-                }
+            if (t.getProjectName().equals(json.getString(KEY_PROJECT))
+                    && t.getRemoteBuildToken().equals(json.getString(KEY_TOKEN))) {
+                t.scheduleBuild(queueName, json.getJSONArray(KEY_PARAMETER));
             }
         }
     }
