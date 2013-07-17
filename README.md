@@ -17,6 +17,24 @@ You need to install [RabbitMQ Consumer Plugin][rabbitmq-consumer] and configure 
 
 If you install this, *RabbitMQ Build Trigger* setting is added into your job project's build trigger section. please enable it then set your token. So build would be triggered if appropriate application message arrives.
 
+Also adds *Publish build result to RabbitMQ* to Post-build Actions in your job's configuration. If you set this action, buid result message is published to your specified exchange in RabbitMQ. Pulished message is the below:
+
+Properties:
+```
+content_type: application/json
+app_id: remote-build
+routingkey: org.jenkinsci.plugins.rabbitmqbuildtrigger
+```
+
+Meesage body:
+```json
+{
+    "project": "PROJECTNAME",
+    "number": "BUILDNUMBER",
+    "status": "SUCCESS|FAILURE|UNSTABLE.."
+}
+```
+
 Application Message Format
 ------------------------
 
