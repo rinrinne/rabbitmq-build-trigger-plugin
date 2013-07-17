@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.rabbitmqbuildtrigger;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
@@ -7,7 +8,9 @@ import java.util.logging.Logger;
 
 import hudson.Extension;
 import hudson.ExtensionPoint;
+import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
+import net.sf.json.JSONSerializer;
 
 import org.jenkinsci.plugins.rabbitmqconsumer.listeners.ApplicationMessageListener;
 
@@ -19,8 +22,8 @@ import org.jenkinsci.plugins.rabbitmqconsumer.listeners.ApplicationMessageListen
 @Extension
 public class RemoteBuildListener implements ExtensionPoint, ApplicationMessageListener {
     private static final String PLUGIN_NAME = "Remote Builder";
-    private static final String PLUGIN_APPID = "remote-build";
 
+    private static final String CONTENT_TYPE_JSON = "application/json";
     private static final String KEY_PROJECT = "project";
     private static final String KEY_TOKEN = "token";
     private static final String KEY_PARAMETER = "parameter";
@@ -42,7 +45,7 @@ public class RemoteBuildListener implements ExtensionPoint, ApplicationMessageLi
      * @return the application id.
      */
     public String getAppId() {
-        return PLUGIN_APPID;
+        return RemoteBuildTrigger.PLUGIN_APPID;
     }
 
     /**
@@ -93,17 +96,29 @@ public class RemoteBuildListener implements ExtensionPoint, ApplicationMessageLi
      * @param json
      *            the content of message.
      */
-    public void onReceive(String queueName, JSONObject json) {
-        for (RemoteBuildTrigger t : triggers) {
+    public void onReceive(String queueName, String contentType, byte[] body) {
+        if (CONTENT_TYPE_JSON.equals(contentType)) {
+            try {
+                String msg = new String(body, "UTF-8");
+                try {
+                    JSONObject json = (JSONObject) JSONSerializer.toJSON(msg);
+                    for (RemoteBuildTrigger t : triggers) {
 
-            if (t.getRemoteBuildToken() == null) {
-                LOGGER.log(Level.WARNING, "ignoring AMQP trigger for project {0}: no token set", t.getProjectName());
-                continue;
-            }
+                        if (t.getRemoteBuildToken() == null) {
+                            LOGGER.log(Level.WARNING, "ignoring AMQP trigger for project {0}: no token set", t.getProjectName());
+                            continue;
+                        }
 
-            if (t.getProjectName().equals(json.getString(KEY_PROJECT))
-                    && t.getRemoteBuildToken().equals(json.getString(KEY_TOKEN))) {
-                t.scheduleBuild(queueName, json.getJSONArray(KEY_PARAMETER));
+                        if (t.getProjectName().equals(json.getString(KEY_PROJECT))
+                                && t.getRemoteBuildToken().equals(json.getString(KEY_TOKEN))) {
+                            t.scheduleBuild(queueName, json.getJSONArray(KEY_PARAMETER));
+                        }
+                    }
+                } catch (JSONException e) {
+                    LOGGER.warning("Invalid JSON format string: ");
+                }
+            } catch (UnsupportedEncodingException e) {
+                LOGGER.warning("Unsupported encoding. Is message body is not string?");
             }
         }
     }

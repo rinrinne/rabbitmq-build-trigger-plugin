@@ -33,6 +33,8 @@ import org.kohsuke.stapler.DataBoundConstructor;
  */
 public class RemoteBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 
+    public static final String PLUGIN_APPID = "remote-build";
+
     private static final String PLUGIN_NAME = Messages.RabbitMQBuildTrigger();
 
     private static final String KEY_PARAM_NAME = "name";
