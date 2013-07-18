@@ -25,6 +25,7 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
+import hudson.util.ListBoxModel;
 
 /**
  * The extension publish build result using rabbitmq.
@@ -35,29 +36,61 @@ public class RemoteBuildPublisher extends Notifier {
 
     private static final Logger LOGGER = Logger.getLogger(RemoteBuildPublisher.class.getName());
 
-    private final String KEY_PROJECT = "project";
-    private final String KEY_NUMBER = "number";
-    private final String KEY_STATUS = "status";
-    private final String JSON_CONTENT_TYPE = "application/json";
-    private final String LOG_HEADER = "Publish to RabbitMQ: ";
+    private static final String KEY_PROJECT = "project";
+    private static final String KEY_NUMBER = "number";
+    private static final String KEY_STATUS = "status";
+    private static final String JSON_CONTENT_TYPE = "application/json";
+
+    private static final String LOG_HEADER = "Publish to RabbitMQ: ";
+    private static final String TYPE_EXCHANGE = "exchange";
+    private static final String TYPE_QUEUE = "queue";
     
-    private String exchangeName;
+    private String brokerType;
+    private String brokerName;
 
     /**
      * Creates instance with specified parameters.
      */
     @DataBoundConstructor
-    public RemoteBuildPublisher(String exchangeName) {
-        this.exchangeName = exchangeName;
+    public RemoteBuildPublisher(String brokerType, String brokerName) {
+        this.brokerType = brokerType;
+        this.brokerName = brokerName;
     }
 
     /**
-     * Gets exchange name.
+     * Gets broker type.
      *
-     * @return the exchange name.
+     * @return the broker type.
      */
-    public String getExchangeName() {
-        return exchangeName;
+    public String getBrokerType() {
+        return brokerType;
+    }
+
+    /**
+     * Sets broker type.
+     *
+     * @param brokerType the broker type.
+     */
+    public void setBrokerType(String brokerType) {
+        this.brokerType = brokerType;
+    }
+
+    /**
+     * Gets broker name.
+     *
+     * @return the broker name.
+     */
+    public String getBrokerName() {
+        return brokerName;
+    }
+
+    /**
+     * Sets broker name.
+     *
+     * @param brokerName the broker name.
+     */
+    public void setBrokerName(String brokerName) {
+        this.brokerName = brokerName;
     }
 
     /**
@@ -74,7 +107,7 @@ public class RemoteBuildPublisher extends Notifier {
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
             throws InterruptedException, IOException {
 
-        if (exchangeName == null || exchangeName.length() == 0) {
+        if (brokerName == null || brokerName.length() == 0) {
             return true;
         }
 
@@ -95,23 +128,48 @@ public class RemoteBuildPublisher extends Notifier {
         // Publish message
         PublishChannel ch = PublishChannelFactory.getPublishChannel();
         if (ch != null && ch.isOpen()) {
-            LOGGER.info("Perform: enter publish process");
-            // return value is not needed if you don't need to wait.
-            Future<PublishResult> future = ch.publish(exchangeName, routingKey, builder.build(), json.toString().getBytes());
-
-            // Wait until publish is completed.
-            try {
-                PublishResult result = future.get();
-                LOGGER.info("Message published.");
-
-                if (result.isSuccess()) {
-                    listener.getLogger().println(LOG_HEADER + "Success.");
-                } else {
-                    listener.getLogger().println(LOG_HEADER + "Fail - " + result.getMessage());
+            if (TYPE_QUEUE.equals(brokerType) && getDescriptor().getExchangeName() == null) {
+                // Setup - decrare exchange then bind to queue.
+                try {
+                    PublishResult result = ch.setupExchange(null, brokerName);
+                    if (result.isSuccess()) {
+                        getDescriptor().setExchangeName(result.getExchangeName());
+                    } else {
+                        getDescriptor().setExchangeName(null);
+                        listener.getLogger().println(LOG_HEADER + "Fail - " + result.getMessage());
+                        return true;
+                    }
+                } catch (Exception e) {
+                    getDescriptor().setExchangeName(null);
+                    listener.getLogger().println(LOG_HEADER + "Fail due to exception during exchange declaration.");
+                    return true;
                 }
-            } catch (Exception e) {
-                LOGGER.warning(e.getMessage());
-                listener.getLogger().println(LOG_HEADER + "Fail due to exception.");
+            }
+
+            String exchangeName = null;
+            if (TYPE_QUEUE.equals(brokerType)) {
+                exchangeName = getDescriptor().getExchangeName();
+            } else if (TYPE_EXCHANGE.equals(brokerType)) {
+                exchangeName = brokerName;
+            }
+
+            if (exchangeName != null) {
+                // return value is not needed if you don't need to wait.
+                Future<PublishResult> future = ch.publish(exchangeName, routingKey, builder.build(), json.toString().getBytes());
+
+                // Wait until publish is completed.
+                try {
+                    PublishResult result = future.get();
+
+                    if (result.isSuccess()) {
+                        listener.getLogger().println(LOG_HEADER + "Success.");
+                    } else {
+                        listener.getLogger().println(LOG_HEADER + "Fail - " + result.getMessage());
+                    }
+                } catch (Exception e) {
+                    LOGGER.warning(e.getMessage());
+                    listener.getLogger().println(LOG_HEADER + "Fail due to exception.");
+                }
             }
         }
         return true;
@@ -133,6 +191,8 @@ public class RemoteBuildPublisher extends Notifier {
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
 
+        private static String exchangeName = null;
+
         /**
          * @inheritDoc
          */
@@ -147,6 +207,35 @@ public class RemoteBuildPublisher extends Notifier {
         @Override
         public String getDisplayName() {
             return Messages.RabbitMQBuildPublisher();
+        }
+
+        /**
+         * Sets exchange name.
+         *
+         * @param exchangeName the exchange name.
+         */
+        synchronized public void setExchangeName(String exchangeName) {
+            DescriptorImpl.exchangeName = exchangeName;
+        }
+
+        /**
+         * Gets exchange name.
+         *
+         * @return the exchange name.
+         */
+        public String getExchangeName() {
+            return exchangeName;
+        }
+
+        /**
+         * Fills listbox item for brokerType.
+         * @return instance.
+         */
+        public ListBoxModel doFillBrokerTypeItems() {
+            ListBoxModel items = new ListBoxModel();
+            items.add(Messages.Exchange(), TYPE_EXCHANGE);
+            items.add(Messages.Queue(), TYPE_QUEUE);
+            return items;
         }
     }
 }

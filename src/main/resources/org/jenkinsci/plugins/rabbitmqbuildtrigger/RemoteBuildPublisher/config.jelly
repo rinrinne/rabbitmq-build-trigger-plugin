@@ -11,7 +11,10 @@
     tags they use. Views are always organized according to its owner class,
     so it should be straightforward to find them.
   -->
-  <f:entry title="${%Exchange name}" field="exchangeName">
+  <f:entry title="${%Type}" field="brokerType">
+    <f:select />
+  </f:entry>
+  <f:entry title="${%Name}" field="brokerName">
     <f:textbox />
   </f:entry>
 </j:jelly>
