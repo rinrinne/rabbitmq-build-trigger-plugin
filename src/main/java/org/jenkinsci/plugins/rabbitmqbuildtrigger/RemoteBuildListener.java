@@ -16,7 +16,7 @@ import org.jenkinsci.plugins.rabbitmqconsumer.listeners.ApplicationMessageListen
 
 /**
  * The extension listen application message then call triggers.
- * 
+ *
  * @author rinrinne a.k.a. rin_ne
  */
 @Extension
@@ -50,7 +50,7 @@ public class RemoteBuildListener implements ExtensionPoint, ApplicationMessageLi
 
     /**
      * Adds trigger.
-     * 
+     *
      * @param trigger
      *            the trigger.
      */
@@ -60,7 +60,7 @@ public class RemoteBuildListener implements ExtensionPoint, ApplicationMessageLi
 
     /**
      * Removes trigger.
-     * 
+     *
      * @param trigger
      *            the trigger.
      */
@@ -89,12 +89,14 @@ public class RemoteBuildListener implements ExtensionPoint, ApplicationMessageLi
     /**
      * Finds matched projects using given project name and token then schedule
      * build.
-     * 
+     *
      * @inheritDoc
      * @param queueName
      *            the queue name.
-     * @param json
-     *            the content of message.
+     * @param contentType
+     *            the content type.
+     * @param body
+     *            the body of message.
      */
     public void onReceive(String queueName, String contentType, byte[] body) {
         if (CONTENT_TYPE_JSON.equals(contentType)) {
