@@ -23,12 +23,12 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jenkinsci.plugins.rabbitmqconsumer.utils.ApplicationMessageNotifyUtil;
+import org.jenkinsci.plugins.rabbitmqconsumer.extensions.MessageQueueListener;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
  * The extension trigger builds by application message.
- * 
+ *
  * @author rinrinne a.k.a. rin_ne
  */
 public class RemoteBuildTrigger extends Trigger<AbstractProject<?, ?>> {
@@ -46,7 +46,7 @@ public class RemoteBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 
     /**
      * Creates instance with specified parameters.
-     * 
+     *
      * @param remoteBuildToken
      *            the token for remote build.
      */
@@ -58,7 +58,8 @@ public class RemoteBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 
     @Override
     public void start(AbstractProject<?, ?> project, boolean newInstance) {
-        RemoteBuildListener listener = ApplicationMessageNotifyUtil.getAllListeners().get(RemoteBuildListener.class);
+        RemoteBuildListener listener = MessageQueueListener.all().get(RemoteBuildListener.class);
+
         if (listener != null) {
             listener.addTrigger(this);
         }
@@ -67,13 +68,13 @@ public class RemoteBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 
     @Override
     public void stop() {
-        ApplicationMessageNotifyUtil.getAllListeners().get(RemoteBuildListener.class).removeTrigger(this);
+        MessageQueueListener.all().get(RemoteBuildListener.class).removeTrigger(this);
         super.stop();
     }
 
     /**
      * Gets token.
-     * 
+     *
      * @return the token.
      */
     public String getRemoteBuildToken() {
@@ -82,7 +83,7 @@ public class RemoteBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 
     /**
      * Sets token.
-     * 
+     *
      * @param remoteBuildToken the token.
      */
     public void setRemoteBuildToken(String remoteBuildToken) {
@@ -91,7 +92,7 @@ public class RemoteBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 
     /**
      * Gets project name.
-     * 
+     *
      * @return the project name.
      */
     public String getProjectName() {
@@ -100,7 +101,7 @@ public class RemoteBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 
     /**
      * Schedules build for triggered job using application message.
-     * 
+     *
      * @param queueName
      *            the queue name.
      * @param jsonArray
@@ -113,7 +114,7 @@ public class RemoteBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 
     /**
      * Gets updated parameters in job.
-     * 
+     *
      * @param jsonParameters
      *            the array of JSONObjects.
      * @param definedParameters
@@ -137,7 +138,7 @@ public class RemoteBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 
     /**
      * Gets definition parameters.
-     * 
+     *
      * @param project
      *            the project.
      * @return the list of parameter values.
@@ -166,7 +167,7 @@ public class RemoteBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 
     /**
      * The descriptor for this trigger.
-     * 
+     *
      * @author rinrinne a.k.a. rin_ne
      */
     @Extension
@@ -184,7 +185,7 @@ public class RemoteBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 
         /**
          * ItemListener implementation class.
-         * 
+         *
          * @author rinrinne a.k.a. rin_ne
          */
         @Extension
@@ -192,8 +193,7 @@ public class RemoteBuildTrigger extends Trigger<AbstractProject<?, ?>> {
 
             @Override
             public void onLoaded() {
-                RemoteBuildListener listener = ApplicationMessageNotifyUtil.getAllListeners().get(
-                        RemoteBuildListener.class);
+                RemoteBuildListener listener = MessageQueueListener.all().get(RemoteBuildListener.class);
                 for (Project<?, ?> p : Jenkins.getInstance().getAllItems(Project.class)) {
                     RemoteBuildTrigger t = p.getTrigger(RemoteBuildTrigger.class);
                     if (t != null) {

@@ -1,18 +1,18 @@
 package org.jenkinsci.plugins.rabbitmqbuildtrigger;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import hudson.Extension;
-import hudson.ExtensionPoint;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONSerializer;
 
-import org.jenkinsci.plugins.rabbitmqconsumer.listeners.ApplicationMessageListener;
+import org.jenkinsci.plugins.rabbitmqconsumer.extensions.MessageQueueListener;
 
 /**
  * The extension listen application message then call triggers.
@@ -20,7 +20,7 @@ import org.jenkinsci.plugins.rabbitmqconsumer.listeners.ApplicationMessageListen
  * @author rinrinne a.k.a. rin_ne
  */
 @Extension
-public class RemoteBuildListener implements ExtensionPoint, ApplicationMessageListener {
+public class RemoteBuildListener extends MessageQueueListener {
     private static final String PLUGIN_NAME = "Remote Builder";
 
     private static final String CONTENT_TYPE_JSON = "application/json";
@@ -32,18 +32,12 @@ public class RemoteBuildListener implements ExtensionPoint, ApplicationMessageLi
 
     private final Set<RemoteBuildTrigger> triggers = new CopyOnWriteArraySet<RemoteBuildTrigger>();
 
-    /**
-     * @inheritDoc
-     * @return the name.
-     */
+    @Override
     public String getName() {
         return PLUGIN_NAME;
     }
 
-    /**
-     * @inheritDoc
-     * @return the application id.
-     */
+    @Override
     public String getAppId() {
         return RemoteBuildTrigger.PLUGIN_APPID;
     }
@@ -68,20 +62,12 @@ public class RemoteBuildListener implements ExtensionPoint, ApplicationMessageLi
         triggers.remove(trigger);
     }
 
-    /**
-     * @inheritDoc
-     * @param queueName
-     *            the queue name.
-     */
+    @Override
     public void onBind(String queueName) {
         LOGGER.info("Bind to: " + queueName);
     }
 
-    /**
-     * @inheritDoc
-     * @param queueName
-     *            the queue name.
-     */
+    @Override
     public void onUnbind(String queueName) {
         LOGGER.info("Unbind from: " + queueName);
     }
@@ -89,16 +75,9 @@ public class RemoteBuildListener implements ExtensionPoint, ApplicationMessageLi
     /**
      * Finds matched projects using given project name and token then schedule
      * build.
-     *
-     * @inheritDoc
-     * @param queueName
-     *            the queue name.
-     * @param contentType
-     *            the content type.
-     * @param body
-     *            the body of message.
      */
-    public void onReceive(String queueName, String contentType, byte[] body) {
+    @Override
+    public void onReceive(String queueName, String contentType, Map<String, Object> headers, byte[] body) {
         if (CONTENT_TYPE_JSON.equals(contentType)) {
             try {
                 String msg = new String(body, "UTF-8");
