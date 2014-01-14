@@ -36,7 +36,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>rabbitmq-consumer</artifactId>
-      <version>1.9</version>
+      <version>2.0</version>
     </dependency>
     <dependency>
         <groupId>org.apache.commons</groupId>
