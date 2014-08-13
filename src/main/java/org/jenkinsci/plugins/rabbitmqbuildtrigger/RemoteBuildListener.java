@@ -92,11 +92,16 @@ public class RemoteBuildListener extends MessageQueueListener {
 
                         if (t.getProjectName().equals(json.getString(KEY_PROJECT))
                                 && t.getRemoteBuildToken().equals(json.getString(KEY_TOKEN))) {
-                            t.scheduleBuild(queueName, json.getJSONArray(KEY_PARAMETER));
+                            if (json.containsKey(KEY_PARAMETER)) {
+                                t.scheduleBuild(queueName, json.getJSONArray(KEY_PARAMETER));
+                            } else {
+                                t.scheduleBuild(queueName, null);
+                            }
                         }
                     }
                 } catch (JSONException e) {
-                    LOGGER.warning("Invalid JSON format string: ");
+                    LOGGER.warning("JSON format string: " + msg);
+                    LOGGER.warning(e.getMessage());
                 }
             } catch (UnsupportedEncodingException e) {
                 LOGGER.warning("Unsupported encoding. Is message body is not string?");
