@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.plugins.rabbitmqconsumer.publishers.PublishChannel;
 import org.jenkinsci.plugins.rabbitmqconsumer.publishers.PublishChannelFactory;
 import org.jenkinsci.plugins.rabbitmqconsumer.publishers.PublishResult;
@@ -55,7 +56,11 @@ public class RemoteBuildPublisher extends Notifier {
     @DataBoundConstructor
     public RemoteBuildPublisher(String brokerName, String routingKey) {
         this.brokerName = brokerName;
-        this.routingKey = routingKey;
+        if (StringUtils.isBlank(routingKey)) {
+            this.routingKey = RemoteBuildPublisher.class.getPackage().getName();
+        } else {
+            this.routingKey = routingKey;
+        }
     }
 
     /**

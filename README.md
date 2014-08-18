@@ -23,7 +23,7 @@ Properties:
 ```
 content_type: application/json
 app_id: remote-build
-routingkey: ROUTINGKEY
+routingkey: ROUTINGKEY or org.jenkinsci.plugins.rabbitmqbuildtrigger
 ```
 
 Message header:
