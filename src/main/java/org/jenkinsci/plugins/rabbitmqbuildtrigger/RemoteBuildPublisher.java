@@ -4,9 +4,12 @@
 package org.jenkinsci.plugins.rabbitmqbuildtrigger;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
+import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 
 import org.jenkinsci.plugins.rabbitmqconsumer.publishers.PublishChannel;
@@ -38,6 +41,7 @@ public class RemoteBuildPublisher extends Notifier {
     private static final String KEY_PROJECT = "project";
     private static final String KEY_NUMBER = "number";
     private static final String KEY_STATUS = "status";
+    private static final String HEADER_JENKINS_URL = "jenkins-url";
     private static final String JSON_CONTENT_TYPE = "application/json";
 
     private static final String LOG_HEADER = "Publish to RabbitMQ: ";
@@ -94,10 +98,15 @@ public class RemoteBuildPublisher extends Notifier {
         json.put(KEY_NUMBER, build.getNumber());
         json.put(KEY_STATUS, build.getResult().toString());
 
-        // Build property
+        // Basic property
         BasicProperties.Builder builder = new BasicProperties.Builder();
         builder.appId(RemoteBuildTrigger.PLUGIN_APPID);
         builder.contentType(JSON_CONTENT_TYPE);
+
+        // Header
+        Map<String, Object> headers = new HashMap<String, Object>();
+        headers.put(HEADER_JENKINS_URL, Jenkins.getInstance().getRootUrl());
+        builder.headers(headers);
 
         // Routing key (ex.)
         String routingKey = RemoteBuildPublisher.class.getPackage().getName();
