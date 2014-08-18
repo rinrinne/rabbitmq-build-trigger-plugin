@@ -23,7 +23,12 @@ Properties:
 ```
 content_type: application/json
 app_id: remote-build
-routingkey: org.jenkinsci.plugins.rabbitmqbuildtrigger
+routingkey: ROUTINGKEY
+```
+
+Message header:
+```
+jenkins-url: JENKINS_ROOT_URL
 ```
 
 Meesage body:
@@ -40,18 +45,18 @@ Application Message Format
 
 ```json
 {
-    "project": "RPROJECTNAME", 
+    "project": "RPROJECTNAME",
     "token": "TOKEN",
     "parameter": [
         {
-            "name": "PARAMETERNAME", 
+            "name": "PARAMETERNAME",
             "value": "VALUE"
         },
         {
             "name": "PARAMETERNAME2",
             "value": "VALUE2"
         }
-    ] 
+    ]
 }
 ```
 

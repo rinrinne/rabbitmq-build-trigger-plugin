@@ -47,13 +47,15 @@ public class RemoteBuildPublisher extends Notifier {
     private static final String LOG_HEADER = "Publish to RabbitMQ: ";
 
     private String brokerName;
+    private String routingKey;
 
     /**
      * Creates instance with specified parameters.
      */
     @DataBoundConstructor
-    public RemoteBuildPublisher(String brokerName) {
+    public RemoteBuildPublisher(String brokerName, String routingKey) {
         this.brokerName = brokerName;
+        this.routingKey = routingKey;
     }
 
     /**
@@ -107,9 +109,6 @@ public class RemoteBuildPublisher extends Notifier {
         Map<String, Object> headers = new HashMap<String, Object>();
         headers.put(HEADER_JENKINS_URL, Jenkins.getInstance().getRootUrl());
         builder.headers(headers);
-
-        // Routing key (ex.)
-        String routingKey = RemoteBuildPublisher.class.getPackage().getName();
 
         // Publish message
         PublishChannel ch = PublishChannelFactory.getPublishChannel();

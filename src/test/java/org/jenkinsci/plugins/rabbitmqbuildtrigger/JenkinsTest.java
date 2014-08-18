@@ -107,6 +107,5 @@ public class JenkinsTest {
                 throw new Exception("Time out.");
             }
         }
-
     }
 }
