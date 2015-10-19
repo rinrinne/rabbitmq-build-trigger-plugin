@@ -43,6 +43,15 @@ public class RemoteBuildListener extends MessageQueueListener {
     }
 
     /**
+     * Get triggers.
+     *
+     *       the triggers.
+     */
+    public  Set<RemoteBuildTrigger> getTriggers(){
+        return this.triggers;
+    }
+    
+    /**
      * Adds trigger.
      *
      * @param trigger
