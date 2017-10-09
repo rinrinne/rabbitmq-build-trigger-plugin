@@ -3,11 +3,12 @@ package org.jenkinsci.plugins.rabbitmqbuildtrigger;
 import hudson.Extension;
 import hudson.model.Item;
 import hudson.model.ParameterValue;
-import hudson.model.AbstractProject;
+import hudson.model.CauseAction;
 import hudson.model.ParameterDefinition;
 import hudson.model.ParametersAction;
 import hudson.model.ParametersDefinitionProperty;
 import hudson.model.Project;
+import hudson.model.Job;
 import hudson.model.StringParameterValue;
 import hudson.model.listeners.ItemListener;
 import hudson.triggers.Trigger;
@@ -18,11 +19,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Logger;
 
 import jenkins.model.Jenkins;
 
+import jenkins.model.ParameterizedJobMixIn;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -35,7 +36,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
  *
  * @author rinrinne a.k.a. rin_ne
  */
-public class RemoteBuildTrigger extends Trigger<AbstractProject<?, ?>> {
+public class RemoteBuildTrigger<T extends Job<?, ?> & ParameterizedJobMixIn.ParameterizedJob> extends Trigger<T> {
 
     public static final String PLUGIN_APPID = "remote-build";
 
@@ -61,7 +62,7 @@ public class RemoteBuildTrigger extends Trigger<AbstractProject<?, ?>> {
     }
 
     @Override
-    public void start(AbstractProject<?, ?> project, boolean newInstance) {
+    public void start(T project, boolean newInstance) {
         RemoteBuildListener listener = MessageQueueListener.all().get(RemoteBuildListener.class);
 
         if (listener != null) {
@@ -117,7 +118,7 @@ public class RemoteBuildTrigger extends Trigger<AbstractProject<?, ?>> {
      */
     public String getProjectName() {
         if(job!=null){
-            return job.getName();
+            return job.getFullName();
         }
         return "";
     }
@@ -133,9 +134,9 @@ public class RemoteBuildTrigger extends Trigger<AbstractProject<?, ?>> {
     public void scheduleBuild(String queueName, JSONArray jsonArray) {
         if (jsonArray != null) {
             List<ParameterValue> parameters = getUpdatedParameters(jsonArray, getDefinitionParameters(job));
-            job.scheduleBuild2(0, new RemoteBuildCause(queueName), new ParametersAction(parameters));
+            ParameterizedJobMixIn.scheduleBuild2(job, 0, new CauseAction(new RemoteBuildCause(queueName)), new ParametersAction(parameters));
         } else {
-            job.scheduleBuild2(0, new RemoteBuildCause(queueName));
+            ParameterizedJobMixIn.scheduleBuild2(job, 0, new CauseAction(new RemoteBuildCause(queueName)));
         }
     }
 
@@ -170,9 +171,9 @@ public class RemoteBuildTrigger extends Trigger<AbstractProject<?, ?>> {
      *            the project.
      * @return the list of parameter values.
      */
-    private List<ParameterValue> getDefinitionParameters(AbstractProject<?, ?> project) {
+    private List<ParameterValue> getDefinitionParameters(Job<?, ?> project) {
         List<ParameterValue> parameters = new ArrayList<ParameterValue>();
-        ParametersDefinitionProperty properties = (ParametersDefinitionProperty) project
+        ParametersDefinitionProperty properties = project
                 .getProperty(ParametersDefinitionProperty.class);
 
         if (properties != null) {
