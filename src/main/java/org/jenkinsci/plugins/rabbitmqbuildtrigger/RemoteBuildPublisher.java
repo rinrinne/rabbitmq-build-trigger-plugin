@@ -101,10 +101,16 @@ public class RemoteBuildPublisher extends Notifier {
         this.routingKey = routingKey;
     } 
     
+    /**
+     * @inheritDoc
+     */
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.NONE;
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener)
             throws InterruptedException, IOException {
@@ -154,6 +160,9 @@ public class RemoteBuildPublisher extends Notifier {
         return true;
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     public DescriptorImpl getDescriptor() {
         return (DescriptorImpl)super.getDescriptor();
@@ -167,11 +176,17 @@ public class RemoteBuildPublisher extends Notifier {
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
 
+        /**
+         * @inheritDoc
+         */
         @Override
         public boolean isApplicable(Class<? extends AbstractProject> project) {
             return true;
         }
 
+        /**
+         * @inheritDoc
+         */
         @Override
         public String getDisplayName() {
             return Messages.RabbitMQBuildPublisher();
