@@ -35,7 +35,7 @@
   <properties>
     <jmockit.version>1.5</jmockit.version>
     <junit.version>4.11</junit.version>
-    <rabbitmq.consumer.version>2.7</rabbitmq.consumer.version>
+    <rabbitmq.consumer.version>2.5</rabbitmq.consumer.version>
     <commons.lang3.version>3.6</commons.lang3.version>
   </properties>
 
