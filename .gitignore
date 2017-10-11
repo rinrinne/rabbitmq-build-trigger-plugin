@@ -5,3 +5,5 @@ work/
 .project
 .settings/
 
+.idea/
+*.iml
