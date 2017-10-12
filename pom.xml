@@ -7,7 +7,7 @@
   </parent>
 
   <artifactId>rabbitmq-build-trigger</artifactId>
-  <version>2.5-SNAPSHOT</version>
+  <version>2.5</version>
   <packaging>hpi</packaging>
   <name>RabbitMQ Build Trigger Plugin</name>
   <description>A plugin that trigger build by message from RabbitMQ.</description>
@@ -122,7 +122,7 @@
     <connection>scm:git:http://github.com/jenkinsci/rabbitmq-build-trigger-plugin.git</connection>
     <developerConnection>scm:git:https://github.com/jenkinsci/rabbitmq-build-trigger-plugin.git</developerConnection>
     <url>https://github.com/jenkinsci/rabbitmq-build-trigger-plugin</url>
-    <tag>HEAD</tag>
+    <tag>rabbitmq-build-trigger-2.5</tag>
   </scm>
 
 </project>
