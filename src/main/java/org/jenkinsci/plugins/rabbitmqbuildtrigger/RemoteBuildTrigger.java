@@ -28,6 +28,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.rabbitmqconsumer.extensions.MessageQueueListener;
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -198,7 +199,7 @@ public class RemoteBuildTrigger<T extends Job<?, ?> & ParameterizedJobMixIn.Para
      *
      * @author rinrinne a.k.a. rin_ne
      */
-    @Extension
+    @Extension @Symbol("remoteBuild")
     public static class DescriptorImpl extends TriggerDescriptor {
 
         @Override
